@@ -1,4 +1,5 @@
 import datetime as dt
+import math
 
 
 class Calculator:
@@ -34,20 +35,19 @@ class Calculator:
 
 
 class CashCalculator(Calculator):
-    USD_RATE = 75
-    EURO_RATE = 85
+    USD_RATE = 75.0
+    EURO_RATE = 85.0
 
     def __init__(self, limit):
         super().__init__(limit)
 
     def __convert_cash(self, cash, currency):
-        format = "%.2f"
         if currency == "rub":
-            return f"{format % cash} руб"
+            return f"{float(cash)} руб"
         elif currency == "usd":
-            return f"{format % (cash / self.USD_RATE)} USD"
+            return f"{round(cash / self.USD_RATE, 2)} USD"
         else:
-            return f"{format % (cash / self.EURO_RATE)} Euro"
+            return f"{round(cash / self.EURO_RATE, 2)} Euro"
 
     def get_today_cash_remained(self, currency):
         amount_today = self.get_today_stats()
@@ -59,12 +59,21 @@ class CashCalculator(Calculator):
         else:
             return f"Денег нет, держись: твой долг - {balance}"
 
+class CaloriesCalculator(Calculator):
+    def __init__(self, limit):
+        super().__init__(limit)
+
+    def get_calories_remained(self):
+        balance = self.limit - self.get_today_stats()
+        if balance > 0:
+            return f"Сегодня можно съесть что-нибудь ещё, но с общей калорийностью не более {balance} кКал"
+        else:
+            return "Хватит есть!"
 
 class Record:
     def __init__(self, amount, comment='', date=dt.datetime.now().date()):
         self.amount = amount
         self.comment = comment
         self.date = date if date == dt.datetime.now().date() else dt.datetime.strptime(date, '%d.%m.%Y').date()
-
 
 

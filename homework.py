@@ -7,4 +7,4 @@ class Calculator:
 
 class Record:
     def __init__(self):
-        
+        kekekekek

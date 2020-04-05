@@ -11,47 +11,34 @@ class Calculator:
         self.records.append(record)
 
     def get_today_stats(self):
-        amount_today = 0
-        for record in self.records:
-            if record.date == dt.datetime.now().date():
-                amount_today += record.amount
-        return amount_today
-
-    def __get_diff_dates(self, date1, date2):
-        if date1 == date2:
-            return 0
-        s = str(date1 - date2)
-        print(date1, date2)
-        days = int(s.split()[0])
-        return abs(days)
+        return sum([record.amount for record in self.records if record.date == dt.datetime.now().date()])
 
     def get_week_stats(self):
         cur_date = dt.datetime.now().date()
-        amount_week = 0
-        for record in self.records:
-            if self.__get_diff_dates(cur_date, record.date) <= 7:
-                amount_week += record.amount
-        return amount_week
+        return sum([record.amount for record in self.records if (cur_date - record.date).days <= 7])
 
 
 class CashCalculator(Calculator):
-    USD_RATE = 75.0
-    EURO_RATE = 85.0
+    USD_RATE = 60.0
+    EURO_RATE = 70.0
 
     def __init__(self, limit):
         super().__init__(limit)
+        self.code2data = {
+            'rub': (1, "руб"),
+            'usd': (self.USD_RATE, "USD"),
+            'eur': (self.EURO_RATE, "Euro")
+        }
 
     def __convert_cash(self, cash, currency):
-        if currency == "rub":
-            return f"{float(cash)} руб"
-        elif currency == "usd":
-            return f"{round(cash / self.USD_RATE, 2)} USD"
-        else:
-            return f"{round(cash / self.EURO_RATE, 2)} Euro"
+        actual_cash = round(cash / self.code2data[currency][0], 2)
+        name = self.code2data[currency][1]
+        return f"{actual_cash} {name}"
 
     def get_today_cash_remained(self, currency):
         amount_today = self.get_today_stats()
         balance = self.__convert_cash(abs(self.limit - amount_today), currency)
+
         if amount_today < self.limit:
             return f"На сегодня осталось {balance}"
         elif amount_today == self.limit:
@@ -77,3 +64,8 @@ class Record:
         self.date = date if date == dt.datetime.now().date() else dt.datetime.strptime(date, '%d.%m.%Y').date()
 
 
+calc = CashCalculator(1000)
+calc.add_record(Record(amount=145, comment="кофе"))
+# и к этой записи тоже дата должна добавиться автоматически
+calc.add_record(Record(amount=300, comment="Серёге за обед", date="03.04.2020"))
+print(calc.get_week_stats())

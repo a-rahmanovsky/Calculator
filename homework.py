@@ -24,14 +24,14 @@ class CashCalculator(Calculator):
 
     def __init__(self, limit):
         super().__init__(limit)
-        self.data_by_currency_code = {
+        self.currency_info = {
             'rub': (1, "руб"),
             'usd': (self.USD_RATE, "USD"),
             'eur': (self.EURO_RATE, "Euro")
         }
 
     def __convert_cash(self, cash, currency):
-        rate, name = self.data_by_currency_code[currency]
+        rate, name = self.currency_info[currency]
         actual_cash = round(cash / rate, 2)
         return f"{actual_cash} {name}"
 
